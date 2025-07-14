@@ -21,42 +21,11 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        swisseph = pkgs.stdenv.mkDerivation rec {
-          pname = "swisseph";
-          version = "2.10.03";
-          src = pkgs.fetchFromGitHub {
-            owner = "aloistr";
-            repo = "swisseph";
-            rev = "v${version}";
-            hash = "sha256-2vjLXxkBRXKQFW7IMSjzKv7ruupsYmmtdRTeWpZltMU=";
-          };
-
-          enableParallelBuilding = true;
-
-          buildPhase = ''
-            make libswe.so
-          '';
-
-          installPhase = ''
-            ls -l
-            mkdir -p $out/lib/pkgconfig
-            mkdir -p $out/include
-            mv libswe.so $out/lib/
-            cp -pr *.h $out/include/
-
-            cat > "$out/lib/pkgconfig/swisseph.pc" <<EOF
-            prefix=$out
-            libdir=$out/lib
-            includedir=$out/include
-
-            Name: SwissEph
-            Description: Swiss Eph
-            Version: ${version}
-            Libs: -L$out/lib
-            Cflags: -I$out/include
-            EOF
-          '';
-
+        swissephSrc = pkgs.fetchFromGitHub {
+          owner = "aloistr";
+          repo = "swisseph";
+          rev = "3729404271ed525b82f517c7dabcd1a25cd6e644";
+          hash = "sha256-Yj/ahXz/3FZNEsTvhCmoTB/TxQdHsp4EOqNSSMLnduw=";
         };
 
         shellForPkgs =
@@ -64,13 +33,12 @@
           pkgs.mkShell {
             name = "panchang-muhurt";
             buildInputs = with pkgs; [
-              pkg-config
-              swisseph
               zig
+              awscli
             ];
 
             shellHook = ''
-
+              export SE_EPHE_PATH=${swissephSrc}/ephe
             '';
 
           };
