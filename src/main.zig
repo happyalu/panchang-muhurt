@@ -5,8 +5,8 @@ var muhurt_window: webui = undefined;
 
 var alloc: std.mem.Allocator = undefined;
 
-var eph: ephemeris.Swe = undefined;
-var comp: computer.Computer(ephemeris.Swe) = undefined;
+var binary_path_buf: [255]u8 = undefined;
+var binary_path: []const u8 = undefined;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -16,14 +16,7 @@ pub fn main() !void {
 
     alloc = gpa.allocator();
 
-    var buf: [255]u8 = undefined;
-    const binary_path = std.fs.selfExeDirPath(&buf) catch "";
-
-    eph = try ephemeris.Swe.init(binary_path);
-    defer eph.deinit();
-
-    comp = .init(eph, alloc);
-    defer comp.deinit();
+    binary_path = try std.fs.selfExeDirPath(&binary_path_buf);
 
     panchang_window = webui.newWindow();
     muhurt_window = webui.newWindow();
@@ -40,6 +33,10 @@ pub fn main() !void {
 }
 
 fn isSwiephAvailable(e: *webui.Event) void {
+    const eph = ephemeris.Swe.init(binary_path) catch {
+        return e.returnBool(false);
+    };
+    defer eph.deinit();
     e.returnBool(!eph.isMoshierFallback());
 }
 
@@ -70,6 +67,12 @@ fn getPanchangaWrapped(input_json: [:0]const u8, sb: anytype) !void {
     const day = try std.fmt.parseInt(u5, day_str, 10);
 
     const d1 = time.Time.fromTimestamp(.{ .y = year, .m = month, .d = day, .tz = input.value.tz });
+
+    const eph = try ephemeris.Swe.init(binary_path);
+    defer eph.deinit();
+
+    var comp = computer.Computer(ephemeris.Swe).init(eph, alloc);
+    defer comp.deinit();
 
     if (input.value.mode == 0) {
         try comp.compute(.{ .begin = d1, .end = d1, .lat = input.value.lat, .lon = input.value.lon });
