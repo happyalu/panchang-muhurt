@@ -100,7 +100,7 @@ pub fn Ephemeris(comptime T: type) type {
             //std.debug.print("pos: {d}  lon: {d}  diff: {d}\n", .{ pos.lon, cross_lon, diff });
             var iters: i32 = 0;
             while (!std.math.approxEqAbs(f64, diff, 0, lon_precision)) : (iters += 1) {
-                if (iters > 100) break;
+                if (iters > 1000) return error.CalcFailure;
                 // the current speed is pos.speed, and we need to cover a distance of diff; therefore time taken would be t = dist/speed
                 const t = (diff / speed);
                 jd += t;
@@ -147,6 +147,8 @@ fn PositionSpanIterator(T: type) type {
             }
 
             const next_val = @mod((1.0 + self.prev_idx) * self.span, 360);
+            //std.debug.print("seeking value {d}\n", .{next_val});
+
             const p = try self.eph.getCrossing(next_val, self.prev_jd, self.ctx);
 
             defer {
