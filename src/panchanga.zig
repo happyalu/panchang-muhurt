@@ -247,6 +247,14 @@ pub const Panchanga = struct {
         }
 
         {
+            for (options.prohibited_yoga) |y| {
+                if (self.yoga == y) {
+                    self.dosha.prohibited_yoga = true;
+                }
+            }
+        }
+
+        {
             const n_idx: u6 = @intFromEnum(self.nakshatra);
             for (options.good_tarabala_for) |natal| {
                 const natal_idx: u5 = @intFromEnum(natal);
@@ -307,6 +315,7 @@ const Dosha = packed struct {
     rikta_tithi: bool = false,
     sthir_karana: bool = false,
     vishti_karana: bool = false,
+    prohibited_yoga: bool = false,
     bad_tarabala: bool = false,
     prohibited_nakshatra: bool = false,
     bad_chandrabala: bool = false,
@@ -322,6 +331,8 @@ pub const DoshaOptions = struct {
     no_rikta_tithi: bool = false,
     no_sthir_karan: bool = false,
     no_vishti_karan: bool = false,
+
+    prohibited_yoga: []const Yoga = &[_]Yoga{},
 
     good_tarabala_for: []const Nakshatra = &[_]Nakshatra{},
     prohibited_nakshatra: []const Nakshatra = &[_]Nakshatra{},

@@ -446,22 +446,24 @@
                       </v-col>
                     </v-row>
 
-                    <v-row dense class="mt-4 mb-2">
-                      <v-col cols="12" class="mr-5">
-                        <v-slider
-                          v-model="maxResults"
-                          label="Max Time Slot Candidates to Find"
-                          min="5"
-                          max="100"
-                          step="5"
-                          thumb-label="always"
-                          class="mt-6"
-                          color="primary"
-                          track-color="grey lighten-2"
-                          hide-details
-                        ></v-slider>
-                      </v-col>
-                    </v-row>
+                    <!--
+                                            <v-row dense class="mt-4 mb-2">
+                                              <v-col cols="12" class="mr-5">
+                                                <v-slider
+                                                  v-model="maxResults"
+                                                  label="Max Time Slot Candidates to Find"
+                                                  min="5"
+                                                  max="100"
+                                                  step="5"
+                                                  thumb-label="always"
+                                                  class="mt-6"
+                                                  color="primary"
+                                                  track-color="grey lighten-2"
+                                                  hide-details
+                                                ></v-slider>
+                                              </v-col>
+                                            </v-row>
+                                          -->
                   </v-tab-item>
                 </v-tabs-items>
 
@@ -472,6 +474,20 @@
                       v-model="selectedFilters"
                       :items="filterOptions"
                       label="Select desired filters"
+                      multiple
+                      chips
+                      outlined
+                      hide-details="auto"
+                    ></v-select>
+                  </v-col>
+                </v-row>
+
+                <v-row dense>
+                  <v-col cols="12">
+                    <v-select
+                      v-model="selectedProhibitedYogas"
+                      :items="yogaOptions"
+                      label="Prohibited Yogas"
                       multiple
                       chips
                       outlined
@@ -844,7 +860,7 @@
             .toISOString()
             .substr(0, 10), // Default to 1 month from now
           endDateMenu: false,
-          maxResults: 10,
+          maxResults: 100,
 
           timezone: 5.5,
           astroData: {
@@ -927,6 +943,37 @@
             { text: "Capricorn", value: 9 },
             { text: "Aquarius", value: 10 },
             { text: "Pisces", value: 11 },
+          ],
+
+          selectedProhibitedYogas: [],
+          yogaOptions: [
+            { text: "Vishkambha", value: 0 },
+            { text: "Priti", value: 1 },
+            { text: "Ayushman", value: 2 },
+            { text: "Saubhagya", value: 3 },
+            { text: "Shobhana", value: 4 },
+            { text: "Atiganda", value: 5 },
+            { text: "Sukarma", value: 6 },
+            { text: "Dhriti", value: 7 },
+            { text: "Shoola", value: 8 },
+            { text: "Ganda", value: 9 },
+            { text: "Vriddhi", value: 10 },
+            { text: "Dhruva", value: 11 },
+            { text: "Vyaghata", value: 12 },
+            { text: "Harshana", value: 13 },
+            { text: "Vajra", value: 14 },
+            { text: "Siddhi", value: 15 },
+            { text: "Vyateepata", value: 16 },
+            { text: "Variyan", value: 17 },
+            { text: "Parigha", value: 18 },
+            { text: "Shiva", value: 19 },
+            { text: "Siddha", value: 20 },
+            { text: "Sadhya", value: 21 },
+            { text: "Shubha", value: 22 },
+            { text: "Shukla", value: 23 },
+            { text: "Brahma", value: 24 },
+            { text: "Indra", value: 25 },
+            { text: "Vaidhriti", value: 26 },
           ],
           rules: {
             required: (value) => !!value || "Required.",
@@ -1206,6 +1253,7 @@
 
                 good_tarabala_for: this.selectedNakshatras,
                 prohibited_nakshatra: this.selectedProhibitedNakshatras,
+                prohibited_yoga: this.selectedProhibitedYogas,
                 good_chandrabala_for: this.selectedRashis,
                 bad_chandrabala_houses: this.selectedChandrabalaHouses,
               },
