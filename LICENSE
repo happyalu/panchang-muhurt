@@ -1,0 +1,12 @@
+SPDX-License-Identifier: MIT OR AGPL-3.0-only
+
+This project is dual-licensed under the MIT License or the GNU Affero General Public License v3.0 (AGPL-3.0-only) at your option.
+
+You may choose either license depending on your use case:
+
+- Use under **AGPL-3.0-only** when this project is used with the **AGPL version of Swiss Ephemeris (swisseph)**.
+- Use under **MIT** or **AGPL-3.0-only** when:
+    - You have a **commercial license** for Swiss Ephemeris, or
+    - You use a **different ephemeris library** that does not impose GPL/AGPL constraints.
+
+See `LICENSES/AGPL-3.0-only.txt` and `LICENSES/MIT.txt` for full license texts.
