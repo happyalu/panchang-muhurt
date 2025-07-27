@@ -4,7 +4,10 @@ This repository contains code for an app that allows exploring the Vedic Panchan
 
 # Motivation
 
-I had taken a short course on [Panchanga and Muhurta](https://www.brhat.in/drashta/course/panchangam25) by Shri [Vedanjanam](https://x.com/VEDANJANAM)* ji.. To better understand some of the technical/mathematical concepts, I started implementing some of them here. With the help of feedback from others participating in the course, a more reasonable/usable tool took shape and is checked in here.
+I had taken a short course on [Panchanga and Muhurta](https://www.brhat.in/drashta/course/panchangam25) by Shri [Vedanjanam](https://x.com/VEDANJANAM) ji.. To better understand some of the technical/mathematical concepts, I started implementing some of them here. With the help of feedback from others participating in the course, a more reasonable/usable tool took shape and is checked in here.
+
+# Using prebuilt binaries
+Precompiled binaries are available on the [Releases](https://github.com/happyalu/panchang-muhurt/releases) page.
 
 # Building
 
