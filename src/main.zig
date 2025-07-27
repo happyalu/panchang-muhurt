@@ -16,7 +16,12 @@ pub fn main() !void {
 
     alloc = gpa.allocator();
 
-    binary_path = try std.fs.selfExeDirPath(&binary_path_buf);
+    const exe_path = try std.fs.selfExeDirPathAlloc(alloc);
+    const ephe_path = try std.fs.path.join(alloc, &[_][]const u8{ exe_path, "ephe" });
+    std.mem.copyForwards(u8, &binary_path_buf, ephe_path);
+    binary_path = binary_path_buf[0..ephe_path.len];
+    alloc.free(exe_path);
+    alloc.free(ephe_path);
 
     panchang_window = webui.newWindow();
     muhurt_window = webui.newWindow();
