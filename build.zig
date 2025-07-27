@@ -52,6 +52,10 @@ pub fn build(b: *std.Build) void {
         exe.subsystem = .Windows;
     }
 
+    if (target.result.isDarwinLibC()) {
+        exe.linkFramework("Cocoa");
+    }
+
     exe.root_module.addImport("webui", zig_webui.module("webui"));
     exe.linkLibrary(swisseph_lib);
     b.installArtifact(exe);
