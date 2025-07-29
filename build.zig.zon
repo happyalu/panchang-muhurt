@@ -48,6 +48,11 @@
             .url = "git+https://github.com/kurtwagner/zlinter?ref=0.14.x#d565ab5446201955ddf55ff1dfb791150fe4fc27",
             .hash = "zlinter-0.0.1-OjQ08ScTCAAZDPkchw9zDZkVIFycO1pD8OSq-hlZgDMz",
         },
+        .macos_sdk = .{
+            .url = "https://github.com/joseluisq/macosx-sdks/releases/download/15.5/MacOSX15.5.sdk.tar.xz",
+            .hash = "N-V-__8AAEg0c2TYnl45ERm8qt0B6b-Rretjyf62AnCDkFMl",
+            .lazy = true,
+        },
     },
     .paths = .{
         "build.zig",

@@ -30,12 +30,15 @@ pub fn build(b: *std.Build) void {
     swisseph_lib.installHeader(swisseph_src.path("swephexp.h"), "swephexp.h");
     swisseph_lib.installHeader(swisseph_src.path("sweodef.h"), "sweodef.h");
 
+    const zig_webui_enableTLS = false;
+    const zig_webui_isStatic = true;
+
     // Use zig-webui as a dependency for the UI.
     const zig_webui = b.dependency("zig_webui", .{
         .target = target,
         .optimize = optimize,
-        .enable_tls = false, // whether enable tls support
-        .is_static = true, // whether static link
+        .enable_tls = zig_webui_enableTLS,
+        .is_static = zig_webui_isStatic,
     });
 
     // Build executable.
@@ -52,13 +55,32 @@ pub fn build(b: *std.Build) void {
         exe.subsystem = .Windows;
     }
 
-    if (target.result.isDarwinLibC()) {
-        exe.linkFramework("Cocoa");
-    }
-
     exe.root_module.addImport("webui", zig_webui.module("webui"));
     exe.linkLibrary(swisseph_lib);
     b.installArtifact(exe);
+
+    if (target.result.os.tag == .macos) {
+        const maybe_macos_sdk = b.lazyDependency("macos_sdk", .{});
+        if (maybe_macos_sdk) |macos_sdk| {
+            const macos_sdk_path = macos_sdk.path("");
+
+            const webui_c_lib = zig_webui.builder.dependency("webui", .{
+                .target = target,
+                .optimize = optimize,
+                .dynamic = !zig_webui_isStatic,
+                .@"enable-tls" = zig_webui_enableTLS,
+                .@"enable-webui-log" = zig_webui_enableTLS,
+                .verbose = .err,
+            }).artifact("webui");
+            webui_c_lib.addSystemFrameworkPath(macos_sdk_path.path(b, "System/Library/Frameworks"));
+            webui_c_lib.addSystemIncludePath(macos_sdk_path.path(b, "usr/include"));
+            webui_c_lib.addLibraryPath(macos_sdk_path.path(b, "usr/lib"));
+
+            exe.addSystemFrameworkPath(macos_sdk_path.path(b, "System/Library/Frameworks"));
+            exe.addSystemIncludePath(macos_sdk_path.path(b, "usr/include"));
+            exe.addLibraryPath(macos_sdk_path.path(b, "usr/lib"));
+        }
+    }
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
