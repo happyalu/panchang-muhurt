@@ -1,0 +1,95 @@
+# .github/workflows/build.yml
+name: Build and Release
+
+on:
+  workflow_call:
+    inputs:
+      create_universal_app:
+        description: "Set to true to create a universal macOS binary."
+        required: false
+        type: boolean
+        default: false
+      upload_release:
+        description: "Set to true to upload all artifacts to a release."
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-linux-windows:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      - name: Build
+        run: |
+          zig build -Dtarget=x86_64-linux-musl -Doptimize=ReleaseSafe
+          mv zig-out/bin/panchang-muhurt zig-out/bin/panchang-muhurt-linux
+          zig build -Dtarget=x86_64-windows -Doptimize=ReleaseSafe
+          rm zig-out/bin/panchang-muhurt.pdb
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-windows
+          path: zig-out/bin/panchang-muhurt*
+          retention-days: 7
+
+  build-macos:
+    name: Build on macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: latest-stable
+
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      - name: Build
+        run: |
+          zig build -Dtarget=x86_64-macos -Doptimize=ReleaseSafe
+          mv zig-out/bin/panchang-muhurt zig-out/bin/panchang-muhurt-x86_64
+          zig build -Dtarget=aarch64-macos -Doptimize=ReleaseSafe
+          mv zig-out/bin/panchang-muhurt zig-out/bin/panchang-muhurt-aarch64
+          lipo -create zig-out/bin/panchang-muhurt-x86_64 zig-out/bin/panchang-muhurt-aarch64 -output zig-out/bin/panchang-muhurt-macos
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: zig-out/bin/panchang-muhurt-macos
+          retention-days: 7
+
+  upload-release:
+    name: Upload All Artifacts to Release
+    runs-on: ubuntu-latest
+    needs: [build-linux-windows, build-macos]
+    if: inputs.upload_release == true
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/panchang-muhurt*
+          prerelease: false # Set to false for stable releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
