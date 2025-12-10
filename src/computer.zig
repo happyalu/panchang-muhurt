@@ -72,7 +72,11 @@ pub fn Computer(T: type) type {
             self.spans.clearRetainingCapacity();
             self.events.clearRetainingCapacity();
 
-            try self.addWaraEvents(opts);
+            var wara_opts = opts;
+            wara_opts.begin = time.Time.fromJdn(opts.begin.jdn() - 1.0 / 24.0, opts.begin.tz);
+            wara_opts.end = time.Time.fromJdn(opts.end.jdn() + 1.0 / 24.0, opts.end.tz);
+
+            try self.addWaraEvents(wara_opts);
             try self.addTithiKaranaEvents(opts);
             try self.addYogaEvents(opts);
             try self.addNakshatraEvents(opts);
@@ -327,8 +331,6 @@ test "wara events" {
         try testing.expectApproxEqRel(e.begin.jdn(), a.begin.jdn(), 1.0 / 86400.0);
         try testing.expectEqualDeep(e.event, a.event);
     }
-
-    //std.debug.print("{any}\n", .{comp.events.items});
 }
 
 test "tithi events" {
